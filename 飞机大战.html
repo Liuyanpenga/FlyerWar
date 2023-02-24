@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>飞机大战</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      .box,
+      .game {
+        width: 320px;
+        height: 568px;
+      }
+
+      .box {
+        background: url(./image/start-background.png);
+        /* position: static; 就是不能默认值 */
+        position: relative;
+      }
+
+      .begin {
+        width: 120px;
+        background-color: #ffffff;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        border-radius: 20px;
+        /* 位置的定位 */
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0px;
+        margin: auto;
+        bottom: -400px;
+        cursor: pointer;
+      }
+
+      .game {
+        display: none;
+        background: url(./image/background_1.png);
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+
+      .score-box {
+        display: none;
+        width: 120px;
+        height: 60px;
+        line-height: 60px;
+        text-align: center;
+        background-color: rgba(56, 151, 176, 0.5);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 一开始的背景图 -->
+    <div class="box">
+      <div class="begin">开始游戏</div>
+    </div>
+    <div class="game">
+      <!-- 两个得分 -->
+      <div>得分:<span class="score1">0</span></div>
+      <div class="score-box">
+        <div>得分:<span class="score2">0</span></div>
+      </div>
+      <!-- 游戏中的所有飞机 加入到这里 -->
+    </div>
+    <script src="./js/init.js"></script>
+    <script src="./js/Flyer.js"></script>
+    <script src="./js/MainPlane.js"></script>
+    <script>
+   
+      $begin.onclick = () => {
+        $game.style.display = "block";
+        game = new GameCenter();
+        game.start();
+      };
+
+      function GameCenter() {}
+      GameCenter.prototype.start = function () {
+        console.log("游戏开始了");
+
+        // 创建战机  我的 敌机 和 子弹
+        mainPlan = new MainPlan(5,20,{ w: 66, h: 80 },{ x: 120, y: maxHeight - 80 },"./image/my-plane.gif");
+        // 敌机
+        enemyTimer = setInterval(function () {
+          var enemy = new Flyer(1,10,{ w: 34, h: 24 },{ x: randomLimit(0, maxWidth - 34), y: 0 },"./image/small-plane.png",DOWN,ENEMY);
+          // enemy.moveTimer = setInterval(enemy.move.bind(enemy),100); // 绑定实例的this
+          enemy.moveTimer = setInterval(() => {enemy.move()}, 100);
+        }, 500);
+
+        // 子弹
+        bulletTimer = setInterval(function () {
+          var bullet = new Flyer(1,10,{ w: 6, h: 14 },{ x: mainPlan.offset.x + 28, y: mainPlan.offset.y - 10},"./image/bullet1.png",UP,BULLET);
+          bullet.moveTimer = setInterval(bullet.move.bind(bullet), 50);
+        },100)
+      };
+      GameCenter.prototype.over = function(){
+        // 清除定时器不再生成敌机和子弹
+        clearInterval(enemyTimer)
+        clearInterval(bulletTimer)
+        // 展示得分板
+        $score2.innerText = $score1.innerText
+        $scoreBox.style.display = 'block'
+        // 清除键盘事件
+        window.removeEventListener('keypress',onkeypressFn)
+      }
+    </script>
+  </body>
+</html>
